@@ -1,12 +1,15 @@
-export default async function getWeather(location: string) {
+import dayjs from 'dayjs'
+const weekday = require('dayjs/plugin/weekday')
+dayjs.extend(weekday)
+
+export default async function getWeather(location: string, startDate: string, endDate: string) {
     // Replace with your desired location
     const locationString = encodeURIComponent(location); // Encode special characters
 
     // Replace with your actual Visual Crossing API key
     const key = process.env.NEXT_PUBLIC_WEATHER_API_KEY
+    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${locationString}/${startDate}/${endDate}?unitGroup=us&key=${key}&contentType=json`;
 
-    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${locationString}/?unitGroup=us&key=${key}&contentType=json`;
-    
     if (key) {
         try {
             const response = await fetch(url);
