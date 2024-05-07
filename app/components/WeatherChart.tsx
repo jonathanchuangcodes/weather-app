@@ -35,7 +35,7 @@ ChartJS.register(
 );
 
 export default function WeatherChart({ day }: { day: number }) {
-    let { weekday, weather } = useWeather();
+    let { time, weekday, weather } = useWeather();
     const today = dayjs().day();
 
     const days = [...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(today - 1, 8), ...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(0, today)]
@@ -47,9 +47,22 @@ export default function WeatherChart({ day }: { day: number }) {
     let dateTimeIndex = useMemo(() => datetimes?.findIndex((datetime) => datetime > dateTime) !== -1 ? datetimes?.findIndex((datetime) => datetime > dateTime) + 1 : 0, [datetimes, dateTime]);
     console.log(datetimes?.findIndex((datetime) => datetime > dateTime));
 
-    const labels = useMemo(() => weather?.days[day]?.hours.map((hour) => hour.datetime)?.slice(Math.sign(dateTimeIndex - 4) > 0 ? dateTimeIndex - 4 : 0, Math.sign(dateTimeIndex - 4) > 0 ? dateTimeIndex + 4 : 6), [dateTimeIndex, day, weather?.days])
+    const getTimeRange = (time: string) => {
+        if (time === "morning") {
+            return [8, 12];
+        } else if (time === "afternoon") {
+            return [12, 16];
+        }
+        else if (time === "evening") {
+            return [16, 20];
+        } else {
+            return [8, 12];
+        }
+    }
+    const timeRange = getTimeRange(time);
+    const labels = useMemo(() => weather?.days[day]?.hours.map((hour) => hour.datetime)?.slice(timeRange[0], timeRange[1] + 1), [day, timeRange, weather?.days])
 
-    const hourlyTempData = useMemo(() => weather?.days[day]?.hours.map((hour) => hour.temp)?.slice(Math.sign(dateTimeIndex - 4) > 0 ? dateTimeIndex - 4 : 0, Math.sign(dateTimeIndex - 4) > 0 ? dateTimeIndex + 4 : 6), [dateTimeIndex, day, weather?.days]);
+    const hourlyTempData = useMemo(() => weather?.days[day]?.hours.map((hour) => hour.temp)?.slice(timeRange[0], timeRange[1] + 1), [day, timeRange, weather?.days]);
 
     const data = {
         labels,
