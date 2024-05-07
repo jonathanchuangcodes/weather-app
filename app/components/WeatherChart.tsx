@@ -35,17 +35,16 @@ ChartJS.register(
 );
 
 export default function WeatherChart({ day }: { day: number }) {
-    let { time, weekday, weather } = useWeather();
-    const today = dayjs().day();
+    let { startDate, time, weekday, weather } = useWeather();
+    const today = dayjs(startDate).day();
 
     const days = [...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(today - 1, 8), ...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(0, today)]
     const dateTime = useMemo(() => dayjs(weather.days[day]?.datetime).unix(), [day, weather.days]);
 
-    const date = dayjs().add(days.findIndex((day) => day === weekday) + day, 'day').format("Do");
+    const date = dayjs(startDate).add(days.findIndex((day) => day === weekday) + day, 'day').format("Do");
     const datetimes = useMemo(() => weather?.days?.[day]?.hours.map((hour) => hour.datetimeEpoch), [day, weather?.days]);
 
     let dateTimeIndex = useMemo(() => datetimes?.findIndex((datetime) => datetime > dateTime) !== -1 ? datetimes?.findIndex((datetime) => datetime > dateTime) + 1 : 0, [datetimes, dateTime]);
-    console.log(datetimes?.findIndex((datetime) => datetime > dateTime));
 
     const getTimeRange = (time: string) => {
         if (time === "morning") {

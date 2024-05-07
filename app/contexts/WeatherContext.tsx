@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState } from "react";
 import Weather from "@interfaces/Weather";
-import Day from "@interfaces/Day";
 import dayjs from 'dayjs'
 const weekday = require('dayjs/plugin/weekday')
 dayjs.extend(weekday)
@@ -26,18 +25,21 @@ const getTimeOfDay = (hour: number): string => {
 }
 
 export interface WeatherContextType {
+    error: boolean;
     weekday: string;
     time: string;
     weather: Weather;
     searchTerm: string;
     isSearching: boolean;
+    startDate: string;
+    setError: (error: boolean) => void;
     setSearchTerm: (searchTerm: string) => void;
     setIsSearching: (isSearching: boolean) => void;
     setWeather: (weather: Weather) => void;
     setWeekday: (weekday: string) => void;
     setTimeOfDay: (time: string) => void;
+    setStartDate: (startDate: string) => void;
 }
-
 
 const WeatherContext = createContext<WeatherContextType>(null as any as WeatherContextType);
 
@@ -51,6 +53,8 @@ export const WeatherProvider = ({
     children: React.ReactNode
 }) => {
     let [weekday, setWeekday] = useState<string>(days[0]);
+    let [error, setError] = useState<boolean>(false);
+    let [startDate, setStartDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
     let [timeOfDay, setTimeOfDay] = useState<string>(getTimeOfDay(hour));
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -74,11 +78,15 @@ export const WeatherProvider = ({
     }
 
     const value = {
+        error,
         weekday,
         time: timeOfDay,
         weather: weatherState,
         searchTerm,
         isSearching,
+        startDate,
+        setError,
+        setStartDate,
         setSearchTerm,
         setIsSearching,
         setWeather,

@@ -20,6 +20,7 @@ export default async function getWeather(location: string, startDate: string, en
             return weatherData;
         } catch (error) {
             console.error("Error:", error);
+            return error;
             // Handle errors appropriately, like displaying an error message to the user
         }
     } else {

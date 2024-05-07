@@ -3,10 +3,11 @@ import getWeather from "@/app/api/weather";
 import { useEffect, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useWeather } from "@/app/contexts/WeatherContext";
+import { useMemo } from "react";
 import dayjs from 'dayjs'
 
 export default function Location() {
-    const { searchTerm, setSearchTerm, setIsSearching, weekday, setWeather } = useWeather();
+    const { startDate, searchTerm, setError, setSearchTerm, setIsSearching, weekday, setWeather } = useWeather();
     const debouncedLocation = useDebounce(searchTerm, 300);
 
     const options = {
@@ -29,19 +30,23 @@ export default function Location() {
     }
 
     const today = dayjs().day();
-    const days = [...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(today - 1, 8), ...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(0, today - 1)]
+    const days = useMemo(() => [...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(today - 1, 8), ...["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].slice(0, today - 1)], [today])
 
-    const startDate = dayjs().add(days.findIndex((day) => day === weekday), "day").format("YYYY-MM-DD");
-    const endDate = dayjs().add(days.findIndex((day) => day === weekday) + 7, "day").format("YYYY-MM-DD");
+    const endDate = useMemo(() => dayjs(startDate).add(days.findIndex((day) => day === weekday) + 7, "day").format("YYYY-MM-DD"), [startDate, weekday, days]);
 
     useEffect(() => {
         window.navigator.geolocation.getCurrentPosition(success, error, options);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
+    useEffect(() => {
         (async function () {
             setIsSearching(true);
             if (debouncedLocation) {
                 const data = await getWeather(debouncedLocation, startDate, endDate);
-                console.log(data);
+                if(data.message)    {
+                    setError(true);
+                }
                 setWeather(data)
             }
             setIsSearching(false);
