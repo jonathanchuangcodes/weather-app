@@ -6,6 +6,7 @@
         "strict": true,
         "noEmit": true,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "module": "esnext",
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
@@ -22,7 +23,8 @@
             "@api/*": ["./app/api/*"],
             "@components/*": ["./app/components/*"],
             "@pages/*": ["./pages/*"],
-            "@styles/*": ["./styles/*"]
+            "@styles/*": ["./styles/*"],
+            "@interfaces/*": ["./app/interfaces/*"]
         }
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
